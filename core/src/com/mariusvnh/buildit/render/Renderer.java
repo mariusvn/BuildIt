@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.mariusvnh.buildit.BuildIt;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,14 +40,18 @@ public class Renderer {
 
     public void render() {
         camController.update();
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         Iterator<Entry<Integer, IRenderable>> it = renderableMap.entrySet().iterator();
         while (it.hasNext()) {
             Entry<Integer, IRenderable> pair = it.next();
-            pair.getValue().render(environment);
-            it.remove();
+            IRenderable tempRenderable = pair.getValue();
+            if (tempRenderable instanceof ILoadable) {
+                if (!((ILoadable) tempRenderable).isLoading())
+                    tempRenderable.render(environment, cam);
+            } else {
+                tempRenderable.render(environment, cam);
+            }
         }
     }
 
@@ -60,5 +65,9 @@ public class Renderer {
     public void unregister(int id) {
         if (renderableMap.remove(id) == null)
             throw new ArrayIndexOutOfBoundsException("invalid unregistering in renderer");
+    }
+
+    public void resize(int width, int height) {
+        Gdx.gl.glViewport(0, 0, width, height);
     }
 }
