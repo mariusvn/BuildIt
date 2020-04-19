@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,27 +29,30 @@ public class Renderer
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-        cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        cam.position.set(1f, 1f, 1f);
-        cam.lookAt(0, 0, 0);
+        cam = new PerspectiveCamera(80, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.position.set(0, 20f, 0);
+        cam.lookAt(5, 5f, 5);
         cam.near = 1f;
-        cam.far = 300f;
+        cam.far = 3000f;
         cam.update();
 
         camController = new CameraInputController(cam);
+        camController.target = new Vector3(0f, 0f, 0f);
         Gdx.input.setInputProcessor(camController);
     }
 
     public void render()
     {
         camController.update();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+        Gdx.gl.glClear(
+                GL20.GL_COLOR_BUFFER_BIT
+                        | GL20.GL_DEPTH_BUFFER_BIT
+                        | (Gdx.graphics.getBufferFormat().coverageSampling
+                        ? GL20.GL_COVERAGE_BUFFER_BIT_NV :
+                        0));
 
-
-        Iterator<Entry<Integer, IRenderable>> it = renderableMap.entrySet().iterator();
-        while (it.hasNext())
+        for (Entry<Integer, IRenderable> pair : renderableMap.entrySet())
         {
-            Entry<Integer, IRenderable> pair = it.next();
             IRenderable tempRenderable = pair.getValue();
             if (tempRenderable instanceof ILoadable)
             {
@@ -78,5 +82,8 @@ public class Renderer
     public void resize(int width, int height)
     {
         Gdx.gl.glViewport(0, 0, width, height);
+        cam.viewportHeight = height;
+        cam.viewportWidth = width;
+        cam.update();
     }
 }

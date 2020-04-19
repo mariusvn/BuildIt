@@ -1,5 +1,6 @@
 package com.mariusvnh.buildit;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -7,51 +8,66 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.utils.Array;
+import com.mariusvnh.buildit.registry.BlockRegistry;
 import com.mariusvnh.buildit.render.ILoadable;
 import com.mariusvnh.buildit.render.IRenderable;
+
+import java.io.FileNotFoundException;
 
 public class Map implements IRenderable, ILoadable
 {
 
     private ModelBatch modelBatch;
-    private AssetManager assetManager;
     private boolean isLoading;
-    private Model ground;
-    private Array<ModelInstance> groundInstances = new Array<>();
-    private final int WIDTH = 10;
-    private final int DEPTH = 15;
+    private final int WIDTH = 5;
+    private final int DEPTH = 5;
+    private Array<Array<ModelInstance>> map = new Array<>();
+    public BlockRegistry blockRegistry;
 
     public Map() {
         modelBatch = new ModelBatch();
-        assetManager = new AssetManager();
-
-        assetManager.load("ground_dirt.g3db", Model.class);
+        try
+        {
+            blockRegistry =  new BlockRegistry();
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+            Gdx.app.exit();
+            return;
+        }
         this.isLoading = true;
     }
 
     @Override
     public void render(Environment environment, Camera camera) {
         modelBatch.begin(camera);
-        modelBatch.render(groundInstances, environment);
+        for (int x = 0; x < WIDTH; x++) {
+            modelBatch.render(map.get(x), environment);
+        }
         modelBatch.end();
     }
 
     @Override
     public boolean isLoading()
     {
-        if (isLoading && assetManager.update())
+        if (isLoading && !blockRegistry.isLoading())
             this.onDoneLoadingAssets();
         return isLoading;
     }
 
     private void onDoneLoadingAssets() {
         this.isLoading = false;
-        this.ground = assetManager.get("ground_dirt.g3db", Model.class);
-        for (float x = 0; x < WIDTH; x++) {
-            for (float y = 0; y < DEPTH; y++) {
-                ModelInstance instance = new ModelInstance(this.ground);
-                instance.transform.translate(x * 10f, 0, y * 10f);
-                groundInstances.add(instance);
+        this.generateMap();
+    }
+
+    public void generateMap() {
+        Model ground = blockRegistry.getBlock("ground").model;
+        for (int x = 0; x < WIDTH; x++) {
+            map.add(new Array<ModelInstance>());
+            for (int y = 0; y < DEPTH; y++) {
+                ModelInstance instance = new ModelInstance(ground);
+                instance.transform.setToTranslation(x * 10f, 0, y * 10f);
+                map.get(x).add(instance);
             }
         }
     }

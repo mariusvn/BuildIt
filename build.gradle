@@ -1,5 +1,5 @@
 buildscript {
-    
+
 
     repositories {
         mavenLocal()
@@ -10,7 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        
+
 
     }
 }
@@ -52,7 +52,8 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
-        
+        api "com.googlecode.json-simple:json-simple:1.1.1"
+
     }
 }
 
@@ -68,6 +69,7 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        
+        api "com.googlecode.json-simple:json-simple:1.1.1"
+
     }
 }

@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "blocks": [
+    {
+      "name": "ground",
+      "model": "ground_dirt.g3db"
+    },
+    {
+      "name": "pond",
+      "model": "ground_dirtRiverTile.g3db"
+    }
+  ]
+}
