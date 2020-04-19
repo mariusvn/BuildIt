@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mariusvnh.buildit.registry.BlockRegistry;
 import com.mariusvnh.buildit.render.ILoadable;
@@ -20,9 +21,12 @@ public class Map implements IRenderable, ILoadable
     private ModelBatch modelBatch;
     private boolean isLoading;
     private final int WIDTH = 5;
+    private final int HEIGHT = 5;
     private final int DEPTH = 5;
-    private Array<Array<ModelInstance>> map = new Array<>();
+    /** 1 - height, 2 - width, 3 - depth */
+    private Array<Array<Array<ModelInstance>>> map = new Array<>(HEIGHT);
     public BlockRegistry blockRegistry;
+    private final Vector3 blockSize = new Vector3(10f, 2.5f, 10f);
 
     public Map() {
         modelBatch = new ModelBatch();
@@ -41,8 +45,12 @@ public class Map implements IRenderable, ILoadable
     @Override
     public void render(Environment environment, Camera camera) {
         modelBatch.begin(camera);
-        for (int x = 0; x < WIDTH; x++) {
-            modelBatch.render(map.get(x), environment);
+        for (int h = 0; h < HEIGHT; h++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                modelBatch.render(map.get(h).get(x), environment);
+            }
         }
         modelBatch.end();
     }
@@ -61,13 +69,21 @@ public class Map implements IRenderable, ILoadable
     }
 
     public void generateMap() {
+        map.setSize(HEIGHT);
         Model ground = blockRegistry.getBlock("ground").model;
-        for (int x = 0; x < WIDTH; x++) {
-            map.add(new Array<ModelInstance>());
-            for (int y = 0; y < DEPTH; y++) {
-                ModelInstance instance = new ModelInstance(ground);
-                instance.transform.setToTranslation(x * 10f, 0, y * 10f);
-                map.get(x).add(instance);
+        for (int h = 0; h < HEIGHT; h++)
+        {
+            map.set(h, new Array<Array<ModelInstance>>());
+            map.get(h).setSize(WIDTH);
+            for (int x = 0; x < WIDTH; x++)
+            {
+                map.get(h).set(x, new Array<ModelInstance>(DEPTH));
+                for (int y = 0; y < DEPTH; y++)
+                {
+                    ModelInstance instance = new ModelInstance(ground);
+                    instance.transform.setToTranslation(x * blockSize.x, h * blockSize.y, y * blockSize.z);
+                    map.get(h).get(x).add(instance);
+                }
             }
         }
     }
