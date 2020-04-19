@@ -27,6 +27,8 @@ public class Map implements IRenderable, ILoadable
     private Array<Array<Array<ModelInstance>>> map = new Array<>(HEIGHT);
     public BlockRegistry blockRegistry;
     private final Vector3 blockSize = new Vector3(10f, 2.5f, 10f);
+    private boolean isMapInstanceExists = false;
+
 
     public Map() {
         modelBatch = new ModelBatch();
@@ -69,6 +71,8 @@ public class Map implements IRenderable, ILoadable
     }
 
     public void generateMap() {
+        if (isMapInstanceExists)
+            return;
         map.setSize(HEIGHT);
         Model ground = blockRegistry.getBlock("ground").model;
         for (int h = 0; h < HEIGHT; h++)
@@ -78,13 +82,30 @@ public class Map implements IRenderable, ILoadable
             for (int x = 0; x < WIDTH; x++)
             {
                 map.get(h).set(x, new Array<ModelInstance>(DEPTH));
+                map.get(h).get(x).setSize(DEPTH);
                 for (int y = 0; y < DEPTH; y++)
                 {
                     ModelInstance instance = new ModelInstance(ground);
                     instance.transform.setToTranslation(x * blockSize.x, h * blockSize.y, y * blockSize.z);
-                    map.get(h).get(x).add(instance);
+                    map.get(h).get(x).set(y, instance);
                 }
             }
         }
+        isMapInstanceExists = true;
+    }
+
+    public void clearMap() {
+        if (!isMapInstanceExists)
+            return;
+        for (int h = 0; h < HEIGHT; h++)
+        {
+            for (int x = 0; x < WIDTH; x++)
+            {
+                map.get(h).get(x).clear();
+            }
+            map.get(h).clear();
+        }
+        map.clear();
+        isMapInstanceExists = false;
     }
 }
