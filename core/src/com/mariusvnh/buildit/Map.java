@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mariusvnh.buildit.registry.BlockRegistry;
 import com.mariusvnh.buildit.render.ILoadable;
 import com.mariusvnh.buildit.render.IRenderable;
+import com.mariusvnh.buildit.render.instanceTypes.WireframeModelInstance;
 
 import java.io.FileNotFoundException;
 
@@ -23,18 +24,22 @@ public class Map implements IRenderable, ILoadable
     private final int WIDTH = 5;
     private final int HEIGHT = 5;
     private final int DEPTH = 5;
-    /** 1 - height, 2 - width, 3 - depth */
+    /**
+     * 1 - height, 2 - width, 3 - depth
+     */
     private Array<Array<Array<ModelInstance>>> map = new Array<>(HEIGHT);
     public BlockRegistry blockRegistry;
     private final Vector3 blockSize = new Vector3(10f, 2.5f, 10f);
     private boolean isMapInstanceExists = false;
+    private boolean isWireframeModeActivated = false;
 
 
-    public Map() {
+    public Map()
+    {
         modelBatch = new ModelBatch();
         try
         {
-            blockRegistry =  new BlockRegistry();
+            blockRegistry = new BlockRegistry();
         } catch (FileNotFoundException e)
         {
             e.printStackTrace();
@@ -45,7 +50,8 @@ public class Map implements IRenderable, ILoadable
     }
 
     @Override
-    public void render(Environment environment, Camera camera) {
+    public void render(Environment environment, Camera camera)
+    {
         modelBatch.begin(camera);
         for (int h = 0; h < HEIGHT; h++)
         {
@@ -65,12 +71,26 @@ public class Map implements IRenderable, ILoadable
         return isLoading;
     }
 
-    private void onDoneLoadingAssets() {
+    private void onDoneLoadingAssets()
+    {
         this.isLoading = false;
         this.generateMap();
     }
 
-    public void generateMap() {
+    public void setWireframeMode(boolean active)
+    {
+        this.isWireframeModeActivated = active;
+        this.clearMap();
+        this.generateMap();
+    }
+
+    public boolean isWireframeModeActivated()
+    {
+        return this.isWireframeModeActivated;
+    }
+
+    public void generateMap()
+    {
         if (isMapInstanceExists)
             return;
         map.setSize(HEIGHT);
@@ -85,7 +105,7 @@ public class Map implements IRenderable, ILoadable
                 map.get(h).get(x).setSize(DEPTH);
                 for (int y = 0; y < DEPTH; y++)
                 {
-                    ModelInstance instance = new ModelInstance(ground);
+                    ModelInstance instance = this.isWireframeModeActivated ? new WireframeModelInstance(ground) : new ModelInstance(ground);
                     instance.transform.setToTranslation(x * blockSize.x, h * blockSize.y, y * blockSize.z);
                     map.get(h).get(x).set(y, instance);
                 }
@@ -94,7 +114,8 @@ public class Map implements IRenderable, ILoadable
         isMapInstanceExists = true;
     }
 
-    public void clearMap() {
+    public void clearMap()
+    {
         if (!isMapInstanceExists)
             return;
         for (int h = 0; h < HEIGHT; h++)

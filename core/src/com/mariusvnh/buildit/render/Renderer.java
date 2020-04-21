@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Vector3;
+import com.mariusvnh.buildit.input.InputHandler;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ public class Renderer
     private final CameraInputController camController;
     private final Map<Integer, IRenderable> renderableMap = new HashMap<>();
     private Integer idIncrement = 0;
+    private InputHandler inputHandler;
 
     public Renderer()
     {
@@ -38,7 +40,7 @@ public class Renderer
 
         camController = new CameraInputController(cam);
         camController.target = new Vector3(0f, 0f, 0f);
-        Gdx.input.setInputProcessor(camController);
+        inputHandler = new InputHandler(camController);
     }
 
     public void render()
