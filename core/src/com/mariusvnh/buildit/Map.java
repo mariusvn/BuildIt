@@ -26,7 +26,7 @@ public class Map implements IRenderable, ILoadable {
      * 1 - height, 2 - width, 3 - depth
      */
     private Array<Array<Array<ModelInstance>>> map = new Array<>(height);
-    public int[][][] mapGrid = null;
+    public long[][][] mapGrid = null;
     public boolean[][][] wireframeMap = null;
     public BlockRegistry blockRegistry;
     private final Vector3 blockSize = new Vector3(10f, 2.5f, 10f);
@@ -47,8 +47,22 @@ public class Map implements IRenderable, ILoadable {
         setDefaultMap();
     }
 
+    public void setBlock(int x, int y, int z, BlockRegistry.RegistryBlock block)
+    {
+        mapGrid[y][x][z] = block.id;
+        wireframeMap[y][x][z] = false;
+        this.map.get(y).get(x).set(z, new ModelInstance(block.model));
+    }
+
+    public void removeBlock(int x, int y, int z)
+    {
+        mapGrid[y][x][z] = 0;
+        wireframeMap[y][x][z] = false;
+        this.map.get(y).get(x).set(z, new ModelInstance(new Model()));
+    }
+
     private void setDefaultMap() {
-        this.mapGrid = new int[height][width][depth];
+        this.mapGrid = new long[height][width][depth];
         this.wireframeMap = new boolean[height][width][depth];
         for (int z = 0; z < height; z++) {
             for (int x = 0; x < width; x++) {
