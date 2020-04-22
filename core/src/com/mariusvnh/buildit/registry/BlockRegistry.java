@@ -47,6 +47,7 @@ public class BlockRegistry implements ILoadable
         BuildIt.logger.log("Reading " + blocksNbr + " blocks ...");
         for (int i = 0; i < blocksNbr; i++) {
             JSONObject obj = (JSONObject) rawBlockList.get(i);
+            BuildIt.logger.log("Adding " + obj.get("name") + " ...");
             assetManager.load("blocks/" + obj.get("model"), Model.class);
         }
         isLoading = true;
@@ -55,6 +56,14 @@ public class BlockRegistry implements ILoadable
     public RegistryBlock getBlock(String name) {
         for (RegistryBlock tmpBlock : blocksList) {
             if (tmpBlock.name.equals(name))
+                return tmpBlock;
+        }
+        return null;
+    }
+
+    public RegistryBlock getBlock(long id) {
+        for (RegistryBlock tmpBlock : blocksList) {
+            if (tmpBlock.id == id)
                 return tmpBlock;
         }
         return null;
@@ -73,17 +82,19 @@ public class BlockRegistry implements ILoadable
         for (int i = 0; i < blocksNbr; i++) {
             JSONObject obj = (JSONObject) rawBlockList.get(i);
             Model tmpModel = assetManager.get("blocks/" + obj.get("model"), Model.class);
-            RegistryBlock block = new RegistryBlock((String) obj.get("name"), (String) obj.get("model"), tmpModel);
+            RegistryBlock block = new RegistryBlock((String) obj.get("name"), (String) obj.get("model"), tmpModel, (long) obj.get("id"));
             blocksList.add(block);
         }
     }
 
     public class RegistryBlock {
+        public final long id;
         public final String name;
         public final String path;
         public final Model model;
 
-        public RegistryBlock(String name, String path, Model model) {
+        public RegistryBlock(String name, String path, Model model, long id) {
+            this.id = id;
             this.name = name;
             this.path = "blocks/" + path;
             this.model = model;

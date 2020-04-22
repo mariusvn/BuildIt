@@ -2,12 +2,12 @@
   "version": "1.0",
   "blocks": [
     {
-      "id": 0,
+      "id": 1,
       "name": "ground",
       "model": "ground_dirt.g3db"
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "pond",
       "model": "ground_dirtRiverTile.g3db"
     }
